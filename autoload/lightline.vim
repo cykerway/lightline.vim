@@ -406,7 +406,7 @@ function! s:line(tabline, inactive) abort
     let _ .= '%#LightlineLeft_' . mode . '_' . li[i] . '#'
     for j in range(len(lc[i]))
       let x = le[i][j] ? lc[i][j] : has_key(f, lc[i][j]) ? s:func(f[lc[i][j]]) : get(c, lc[i][j], '')
-      let _ .= has_key(t, lc[i][j]) && t[lc[i][j]] ==# 'raw' || get(w, lc[i][j]) || le[i][j] ==# 2 || x ==# '' ? x : '%( ' . x . ' %)'
+      let _ .= has_key(t, lc[i][j]) && t[lc[i][j]] ==# 'raw' || get(w, lc[i][j]) || le[i][j] ==# 2 || x ==# '' ? x : '%(' . x . '%)'
       if j < len(lc[i]) - 1 && s.left !=# ''
         let _ .= s:subseparator(lc[i][(j):], s.left, le[i][(j):])
       endif
@@ -421,7 +421,7 @@ function! s:line(tabline, inactive) abort
     let _ .= '%#LightlineRight_' . mode . '_' . ri[i] . '#'
     for j in range(len(rc[i]))
       let x = re[i][j] ? rc[i][j] : has_key(f, rc[i][j]) ? s:func(f[rc[i][j]]) : get(c, rc[i][j], '')
-      let _ .= has_key(t, rc[i][j]) && t[rc[i][j]] ==# 'raw' || get(w, rc[i][j]) || re[i][j] ==# 2 || x ==# '' ? x : '%( ' . x . ' %)'
+      let _ .= has_key(t, rc[i][j]) && t[rc[i][j]] ==# 'raw' || get(w, rc[i][j]) || re[i][j] ==# 2 || x ==# '' ? x : '%(' . x . '%)'
       if j < len(rc[i]) - 1 && s.right !=# ''
         let _ .= s:subseparator(rc[i][(j):], s.right, re[i][(j):])
       endif
@@ -456,7 +456,7 @@ function! lightline#tabs() abort
   let nr = tabpagenr()
   let cnt = tabpagenr('$')
   for i in range(1, cnt)
-    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . '%' . i . 'T%{lightline#onetab(' . i . ',' . (i == nr) . ')}' . (i == cnt ? '%T' : ''))
+    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . '%' . i . 'T %{lightline#onetab(' . i . ',' . (i == nr) . ')} ' . (i == cnt ? '%T' : ''))
   endfor
   let abbr = '...'
   let n = min([max([&columns / 40, 2]), 8])
@@ -482,7 +482,7 @@ function! lightline#onetab(n, active) abort
       call add(_, get(s:lightline.tab_component, name, ''))
     endif
   endfor
-  return join(filter(_, 'v:val !=# ""'), ' ')
+  return join(filter(_, 'v:val !=# ""'), '')
 endfunction
 
 function! lightline#bufs() abort
@@ -490,7 +490,7 @@ function! lightline#bufs() abort
   let nr = bufnr()
   for d in getbufinfo({'buflisted': 1})
     let i = d['bufnr']
-    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . '%{lightline#onebuf(' . i . ',' . (i == nr) . ')}')
+    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . ' %{lightline#onebuf(' . i . ',' . (i == nr) . ')} ')
   endfor
   let abbr = '...'
   let n = min([max([&columns / 40, 2]), 8])
@@ -516,7 +516,7 @@ function! lightline#onebuf(n, active) abort
       call add(_, get(s:lightline.tab_component, name, ''))
     endif
   endfor
-  return join(filter(_, 'v:val !=# ""'), ' ')
+  return join(filter(_, 'v:val !=# ""'), '')
 endfunction
 
 function! lightline#error(msg) abort

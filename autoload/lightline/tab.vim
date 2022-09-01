@@ -17,7 +17,7 @@ endfunction
 
 function! lightline#tab#modified(n) abort
   let winnr = tabpagewinnr(a:n)
-  return gettabwinvar(a:n, winnr, '&modified') ? '+' : gettabwinvar(a:n, winnr, '&modifiable') ? '' : '-'
+  return gettabwinvar(a:n, winnr, '&modified') ? '+' : gettabwinvar(a:n, winnr, '&modifiable') ? ' ' : '-'
 endfunction
 
 function! lightline#tab#readonly(n) abort
@@ -35,7 +35,7 @@ function! lightline#tab#buffilename(n) abort
 endfunction
 
 function! lightline#tab#bufmodified(n) abort
-  return getbufvar(a:n, '&modified') ? '+' : getbufvar(a:n, '&modifiable') ? '' : '-'
+  return getbufvar(a:n, '&modified') ? '+' : getbufvar(a:n, '&modifiable') ? ' ' : '-'
 endfunction
 
 function! lightline#tab#bufreadonly(n) abort
