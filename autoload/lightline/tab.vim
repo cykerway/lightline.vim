@@ -29,5 +29,22 @@ function! lightline#tab#tabnum(n) abort
   return a:n
 endfunction
 
+function! lightline#tab#buffilename(n) abort
+  let _ = fnamemodify(bufname(a:n), ':t')
+  return _ !=# '' ? _ : '[No Name]'
+endfunction
+
+function! lightline#tab#bufmodified(n) abort
+  return getbufvar(a:n, '&modified') ? '+' : getbufvar(a:n, '&modifiable') ? '' : '-'
+endfunction
+
+function! lightline#tab#bufreadonly(n) abort
+  return getbufvar(a:n, '&readonly') ? 'RO' : ''
+endfunction
+
+function! lightline#tab#buftabnum(n) abort
+  return a:n
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo

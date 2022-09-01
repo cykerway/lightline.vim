@@ -15,7 +15,7 @@ set cpo&vim
 
 augroup lightline
   autocmd!
-  autocmd WinEnter,BufEnter,SessionLoadPost,FileChangedShellPost * call lightline#update()
+  autocmd TabEnter,WinEnter,BufEnter,BufAdd,BufDelete,SessionLoadPost,FileChangedShellPost * call lightline#update()
   if !has('patch-8.1.1715')
     autocmd FileType qf call lightline#update()
   endif

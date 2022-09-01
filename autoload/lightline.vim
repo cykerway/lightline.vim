@@ -24,6 +24,9 @@ function! lightline#update() abort
       call setwinvar(n, '&statusline', s[n!=w])
     endfor
   endif
+  if s:lightline.enable.tabline
+    redrawtabline
+  endif
 endfunction
 
 if exists('*win_gettype')
@@ -118,16 +121,19 @@ let s:_lightline = {
       \   'component_function': {},
       \   'component_function_visible_condition': {},
       \   'component_expand': {
-      \     'tabs': 'lightline#tabs'
+      \     'tabs': 'lightline#tabs',
+      \     'bufs': 'lightline#bufs'
       \   },
       \   'component_type': {
-      \     'tabs': 'tabsel', 'close': 'raw'
+      \     'tabs': 'tabsel', 'bufs': 'bufsel', 'close': 'raw'
       \   },
       \   'component_raw': {},
       \   'tab_component': {},
       \   'tab_component_function': {
       \     'filename': 'lightline#tab#filename', 'modified': 'lightline#tab#modified',
-      \     'readonly': 'lightline#tab#readonly', 'tabnum': 'lightline#tab#tabnum'
+      \     'readonly': 'lightline#tab#readonly', 'tabnum': 'lightline#tab#tabnum',
+      \     'buffilename': 'lightline#tab#buffilename', 'bufmodified': 'lightline#tab#bufmodified',
+      \     'bufreadonly': 'lightline#tab#bufreadonly', 'buftabnum': 'lightline#tab#buftabnum'
       \   },
       \   'colorscheme': 'default',
       \   'mode_map': {
@@ -426,15 +432,19 @@ endfunction
 
 let s:tabnr = -1
 let s:tabcnt = -1
+let s:bufnr = -1
+let s:bufcnt = -1
 let s:columns = -1
 let s:tabline = ''
 function! lightline#tabline() abort
   if !has_key(s:highlight, 'tabline')
     call lightline#highlight('tabline')
   endif
-  if s:lightline.tabline_configured || s:tabnr != tabpagenr() || s:tabcnt != tabpagenr('$') || s:columns != &columns
+  if s:lightline.tabline_configured || s:tabnr != tabpagenr() || s:tabcnt != tabpagenr('$') || s:bufnr != bufnr() || s:bufcnt != len(getbufinfo({'buflisted': 1})) || s:columns != &columns
     let s:tabnr = tabpagenr()
     let s:tabcnt = tabpagenr('$')
+    let s:bufnr = bufnr()
+    let s:bufcnt = len(getbufinfo({'buflisted': 1}))
     let s:columns = &columns
     let s:tabline = s:line(1, 0)
   endif
@@ -464,6 +474,40 @@ function! lightline#tabs() abort
 endfunction
 
 function! lightline#onetab(n, active) abort
+  let _ = []
+  for name in a:active ? s:lightline.tab.active : s:lightline.tab.inactive
+    if has_key(s:lightline.tab_component_function, name)
+      call add(_, call(s:lightline.tab_component_function[name], [a:n]))
+    else
+      call add(_, get(s:lightline.tab_component, name, ''))
+    endif
+  endfor
+  return join(filter(_, 'v:val !=# ""'), ' ')
+endfunction
+
+function! lightline#bufs() abort
+  let [x, y, z] = [[], [], []]
+  let nr = bufnr()
+  for d in getbufinfo({'buflisted': 1})
+    let i = d['bufnr']
+    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . '%{lightline#onebuf(' . i . ',' . (i == nr) . ')}')
+  endfor
+  let abbr = '...'
+  let n = min([max([&columns / 40, 2]), 8])
+  if len(x) > n && len(z) > n
+    let x = extend(add(x[:n/2-1], abbr), x[-(n+1)/2:])
+    let z = extend(add(z[:(n+1)/2-1], abbr), z[-n/2:])
+  elseif len(x) + len(z) > 2 * n
+    if len(x) > n
+      let x = extend(add(x[:(2*n-len(z))/2-1], abbr), x[-(2*n-len(z)+1)/2:])
+    elseif len(z) > n
+      let z = extend(add(z[:(2*n-len(x)+1)/2-1], abbr), z[-(2*n-len(x))/2:])
+    endif
+  endif
+  return [x, y, z]
+endfunction
+
+function! lightline#onebuf(n, active) abort
   let _ = []
   for name in a:active ? s:lightline.tab.active : s:lightline.tab.inactive
     if has_key(s:lightline.tab_component_function, name)
