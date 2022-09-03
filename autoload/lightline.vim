@@ -458,21 +458,16 @@ endfunction
 
 function! lightline#tabs() abort
   let [x, y, z] = [[], [], []]
+  let n = min([max([&columns / 30, 2]), 8])
   let nr = tabpagenr()
   let cnt = tabpagenr('$')
   for i in range(1, cnt)
-    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . '%' . i . 'T %{lightline#onetab(' . i . ',' . (i == nr) . ')} ' . (i == cnt ? '%T' : ''))
+    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . '%' . i . 'T %{lightline#onetab(' . i . ',' . (i == nr) . ')} ' . (i == cnt ? '%T' : ''))
   endfor
-  let abbr = '...'
-  let n = min([max([&columns / 30, 2]), 8])
-  if len(x) > n && len(z) > n
-    let x = extend(add(x[:n/2-1], abbr), x[-(n+1)/2:])
-    let z = extend(add(z[:(n+1)/2-1], abbr), z[-n/2:])
-  elseif len(x) + len(z) > 2 * n
+  if len(x) + len(z) > 2 * n
     if len(x) > n
-      let x = extend(add(x[:(2*n-len(z))/2-1], abbr), x[-(2*n-len(z)+1)/2:])
-    elseif len(z) > n
-      let z = extend(add(z[:(2*n-len(x)+1)/2-1], abbr), z[-(2*n-len(x))/2:])
+      let m = max([n, 2*n-len(z)])
+      let x = x[-m:]
     endif
   endif
   return [x, y, z]
@@ -492,24 +487,19 @@ endfunction
 
 function! lightline#bufs() abort
   let [x, y, z] = [[], [], []]
+  let n = min([max([&columns / 30, 2]), 8])
   let nr = bufnr()
   for d in getbufinfo({'buflisted': 1})
     let i = d['bufnr']
     if i == get(s:, 'bufdelete_bufnr', 0)
       continue
     endif
-    call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . ' %{lightline#onebuf(' . i . ',' . (i == nr) . ')} ')
+    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . ' %{lightline#onebuf(' . i . ',' . (i == nr) . ')} ')
   endfor
-  let abbr = '...'
-  let n = min([max([&columns / 30, 2]), 8])
-  if len(x) > n && len(z) > n
-    let x = extend(add(x[:n/2-1], abbr), x[-(n+1)/2:])
-    let z = extend(add(z[:(n+1)/2-1], abbr), z[-n/2:])
-  elseif len(x) + len(z) > 2 * n
+  if len(x) + len(z) > 2 * n
     if len(x) > n
-      let x = extend(add(x[:(2*n-len(z))/2-1], abbr), x[-(2*n-len(z)+1)/2:])
-    elseif len(z) > n
-      let z = extend(add(z[:(2*n-len(x)+1)/2-1], abbr), z[-(2*n-len(x))/2:])
+      let m = max([n, 2*n-len(z)])
+      let x = x[-m:]
     endif
   endif
   return [x, y, z]
