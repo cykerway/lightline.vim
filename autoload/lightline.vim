@@ -10,6 +10,10 @@ set cpo&vim
 
 let s:_ = 1 " 1: uninitialized, 2: disabled
 
+function! lightline#bufdelete() abort
+  let s:bufdelete_bufnr = str2nr(expand('<abuf>'))
+endfunction
+
 function! lightline#update() abort
   if s:skip() | return | endif
   if s:_
@@ -27,6 +31,7 @@ function! lightline#update() abort
   if s:lightline.enable.tabline
     redrawtabline
   endif
+  let s:bufdelete_bufnr = 0
 endfunction
 
 if exists('*win_gettype')
@@ -490,6 +495,9 @@ function! lightline#bufs() abort
   let nr = bufnr()
   for d in getbufinfo({'buflisted': 1})
     let i = d['bufnr']
+    if i == get(s:, 'bufdelete_bufnr', 0)
+      continue
+    endif
     call add(i < nr ? x : i == nr ? y : z, (i > nr + 3 ? '%<' : '') . ' %{lightline#onebuf(' . i . ',' . (i == nr) . ')} ')
   endfor
   let abbr = '...'
