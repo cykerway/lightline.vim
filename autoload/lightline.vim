@@ -127,11 +127,11 @@ let s:_lightline = {
       \   'component_function_visible_condition': {},
       \   'component_expand': {
       \     'tabs': 'lightline#tabs',
-      \     'bufs': 'lightline#bufs',
+      \     'buftabs': 'lightline#buftabs',
       \     'smarttabs': 'lightline#smarttabs'
       \   },
       \   'component_type': {
-      \     'tabs': 'tabsel', 'bufs': 'bufsel', 'close': 'raw'
+      \     'tabs': 'tabsel', 'buftabs': 'buftabsel', 'smarttabs': 'smarttabsel', 'close': 'raw'
       \   },
       \   'component_raw': {},
       \   'tab_component': {},
@@ -488,7 +488,7 @@ function! lightline#onetab(n, active) abort
   return join(filter(_, 'v:val !=# ""'), '')
 endfunction
 
-function! lightline#bufs() abort
+function! lightline#buftabs() abort
   let [x, y, z] = [[], [], []]
   let n = min([max([&columns / 30, 2]), 8])
   let nr = bufnr()
@@ -522,7 +522,7 @@ endfunction
 
 function! lightline#smarttabs() abort
   if g:lightline_use_buftab
-    return lightline#bufs()
+    return lightline#buftabs()
   else
     return lightline#tabs()
   endif
