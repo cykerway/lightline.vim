@@ -127,7 +127,8 @@ let s:_lightline = {
       \   'component_function_visible_condition': {},
       \   'component_expand': {
       \     'tabs': 'lightline#tabs',
-      \     'bufs': 'lightline#bufs'
+      \     'bufs': 'lightline#bufs',
+      \     'smarttabs': 'lightline#smarttabs'
       \   },
       \   'component_type': {
       \     'tabs': 'tabsel', 'bufs': 'bufsel', 'close': 'raw'
@@ -138,7 +139,9 @@ let s:_lightline = {
       \     'filename': 'lightline#tab#filename', 'modified': 'lightline#tab#modified',
       \     'readonly': 'lightline#tab#readonly', 'tabnum': 'lightline#tab#tabnum',
       \     'buffilename': 'lightline#tab#buffilename', 'bufmodified': 'lightline#tab#bufmodified',
-      \     'bufreadonly': 'lightline#tab#bufreadonly', 'buftabnum': 'lightline#tab#buftabnum'
+      \     'bufreadonly': 'lightline#tab#bufreadonly', 'buftabnum': 'lightline#tab#buftabnum',
+      \     'smartfilename': 'lightline#tab#smartfilename', 'smartmodified': 'lightline#tab#smartmodified',
+      \     'smartreadonly': 'lightline#tab#smartreadonly', 'smarttabnum': 'lightline#tab#smarttabnum'
       \   },
       \   'colorscheme': 'default',
       \   'mode_map': {
@@ -462,7 +465,7 @@ function! lightline#tabs() abort
   let nr = tabpagenr()
   let cnt = tabpagenr('$')
   for i in range(1, cnt)
-    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . '%' . i . 'T %{lightline#onetab(' . i . ',' . (i == nr) . ')} ' . (i == cnt ? '%T' : ''))
+    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . '%' . i . 'T %{lightline#onesmarttab(' . i . ',' . (i == nr) . ')} ' . (i == cnt ? '%T' : ''))
   endfor
   if len(x) + len(z) > 2 * n
     if len(x) > n
@@ -494,7 +497,7 @@ function! lightline#bufs() abort
     if i == get(s:, 'bufdelete_bufnr', 0)
       continue
     endif
-    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . ' %{lightline#onebuf(' . i . ',' . (i == nr) . ')} ')
+    call add(i < nr ? x : i == nr ? y : z, (len(z) == n ? '%<' : '') . ' %{lightline#onesmarttab(' . i . ',' . (i == nr) . ')} ')
   endfor
   if len(x) + len(z) > 2 * n
     if len(x) > n
@@ -515,6 +518,22 @@ function! lightline#onebuf(n, active) abort
     endif
   endfor
   return join(filter(_, 'v:val !=# ""'), '')
+endfunction
+
+function! lightline#smarttabs() abort
+  if g:lightline_use_buftab
+    return lightline#bufs()
+  else
+    return lightline#tabs()
+  endif
+endfunction
+
+function! lightline#onesmarttab(n, active) abort
+  if g:lightline_use_buftab
+    return lightline#onebuf(a:n, a:active)
+  else
+    return lightline#onetab(a:n, a:active)
+  endif
 endfunction
 
 function! lightline#error(msg) abort

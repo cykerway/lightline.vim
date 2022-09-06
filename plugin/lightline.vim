@@ -13,6 +13,8 @@ let g:loaded_lightline = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+let g:lightline_use_buftab = get(g:, 'lightline_use_buftab', 0)
+
 augroup lightline
   autocmd!
   autocmd BufDelete * call lightline#bufdelete()

@@ -46,5 +46,37 @@ function! lightline#tab#buftabnum(n) abort
   return a:n
 endfunction
 
+function! lightline#tab#smartfilename(n) abort
+  if g:lightline_use_buftab
+    return lightline#tab#buffilename(a:n)
+  else
+    return lightline#tab#filename(a:n)
+  endif
+endfunction
+
+function! lightline#tab#smartmodified(n) abort
+  if g:lightline_use_buftab
+    return lightline#tab#bufmodified(a:n)
+  else
+    return lightline#tab#modified(a:n)
+  endif
+endfunction
+
+function! lightline#tab#smartreadonly(n) abort
+  if g:lightline_use_buftab
+    return lightline#tab#bufreadonly(a:n)
+  else
+    return lightline#tab#readonly(a:n)
+  endif
+endfunction
+
+function! lightline#tab#smarttabnum(n) abort
+  if g:lightline_use_buftab
+    return lightline#tab#buftabnum(a:n)
+  else
+    return lightline#tab#tabnum(a:n)
+  endif
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
